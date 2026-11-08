@@ -1,0 +1,5 @@
+#!/bin/sh
+# Restart the Aster panel (AGS). Used by Super+Shift+R.
+ags quit 2>/dev/null || pkill -x gjs
+sleep 0.5
+exec ags run /home/danim/aster/shell

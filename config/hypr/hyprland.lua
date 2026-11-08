@@ -49,6 +49,7 @@ hl.animation({ leaf = "fade",       enabled = true, speed = 3, bezier = "macOut"
 hl.animation({ leaf = "workspaces", enabled = true, speed = 4, bezier = "macOut", style = "slide" })
 
 -- Keys (Super = Cmd)
+hl.bind(mainMod .. " + SHIFT + R", hl.dsp.exec_cmd("/home/danim/aster/config/scripts/aster-panel-restart"))
 hl.bind(mainMod .. " + Q",       hl.dsp.window.close())          -- Cmd+Q quit
 hl.bind(mainMod .. " + W",       hl.dsp.window.close())          -- Cmd+W close
 hl.bind(mainMod .. " + space",   hl.dsp.exec_cmd(launcher))      -- Cmd+Space
