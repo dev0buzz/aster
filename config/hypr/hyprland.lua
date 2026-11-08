@@ -65,5 +65,8 @@ end
 
 -- Autostart
 hl.on("hyprland.start", function()
+  hl.exec_cmd("ags run /home/danim/aster/shell")   -- inside hl.on("hyprland.start")
   hl.exec_cmd("/usr/libexec/polkit-mate-authentication-agent-1")  -- check path from step 1
+  -- Super+Shift+R: restart the panel while developing
+  hl.bind(mainMod .. " + SHIFT + R", hl.dsp.exec_cmd("pkill -f 'ags run'; ags run /home/danim/aster/shell"))
 end)

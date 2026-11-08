@@ -1,20 +1,28 @@
-// https://gitlab.gnome.org/GNOME/gtk/-/blob/gtk-3-24/gtk/theme/Adwaita/_colors-public.scss
-$fg-color: #{"@theme_fg_color"};
-$bg-color: #{"@theme_bg_color"};
-
+// Aster panel v1 (light). Dark mode comes in week 8.
 window.Bar {
-  background: transparent;
-  color: $fg-color;
-  font-weight: bold;
-
-  > centerbox {
-    background: $bg-color;
-    border-radius: 10px;
-    margin: 8px;
-  }
+  background: rgba(246, 246, 246, 0.85);
+  color: #1d1d1f;
+  font-family: "Inter", sans-serif;
+  font-size: 13px;
+  min-height: 28px;
 
   button {
-    border-radius: 8px;
-    margin: 2px;
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    border-radius: 6px;
+    padding: 0 10px;
+    margin: 3px 2px;
+    min-height: 22px;
   }
+  button:hover { background: rgba(0, 0, 0, 0.08); }
+
+  .logo label { font-size: 15px; }
+  .app-name   { font-weight: 700; margin: 0 8px 0 4px; }
+}
+
+popover .menu {
+  padding: 4px;
+  min-width: 200px;
+  button { padding: 4px 12px; border-radius: 5px; }
 }
