@@ -3,6 +3,7 @@ import style from "./style.scss"
 import Bar from "./widget/Bar"
 import NotificationPopups from "./widget/NotificationPopups"
 import NotificationCenter from "./widget/NotificationCenter"
+import OSD from "./widget/OSD"
 
 app.start({
   css: style,
@@ -10,5 +11,6 @@ app.start({
     app.get_monitors().map(Bar)
     NotificationPopups()
     NotificationCenter()
+    OSD()
   },
 })

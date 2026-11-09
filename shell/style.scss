@@ -1,3 +1,5 @@
+@function tint($a) { @return unquote("alpha(currentColor, #{$a})"); }
+
 // Aster panel v1 (light). Dark mode comes in week 8.
 window.Bar {
   background: rgba(246, 246, 246, 0.85);
@@ -72,4 +74,58 @@ window.Bar .bell label { font-weight: 700; }
     background: transparent; border: none; box-shadow: none;
     padding: 0 6px; min-height: 0; font-size: 11px;
   }
+}
+
+// ---- Control Center (week 5) ----
+popover .cc {
+  padding: 10px;
+  font-family: "Inter", sans-serif;
+  font-size: 13px;
+
+  // Tinted with the text colour: visible in both light and dark mode
+  .tile, .section {
+    background: tint(0.07);
+    border: 1px solid tint(0.08);
+    border-radius: 14px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.18);
+  }
+
+  .tile {
+    padding: 8px 10px;
+    // the round icon bubble
+    image {
+      background: tint(0.12);
+      border-radius: 999px;
+      padding: 7px;
+    }
+  }
+  .tile:hover { background: tint(0.11); }
+
+  // On = only the bubble turns blue (like macOS), not the whole tile
+  .tile.active image { background: #0a84ff; color: white; }
+
+  .tile-title { font-weight: 700; }
+  .tile-sub   { font-size: 11px; opacity: 0.65; }
+
+  .section { padding: 8px 10px; }
+  .section-title { font-weight: 700; margin-bottom: 2px; }
+
+  .mute, .output, .media button {
+    background: transparent; border: none; box-shadow: none;
+  }
+  .output:hover, .media button:hover { background: tint(0.08); }
+  .media-title  { font-weight: 700; }
+  .media-artist { font-size: 11px; opacity: 0.65; }
+}
+
+// ---- OSD (week 5) ----
+window.OSD { background: transparent; }
+.osd {
+  background: rgba(30, 30, 30, 0.85);
+  color: white;
+  border-radius: 999px;
+  padding: 12px 20px;
+  levelbar trough { min-height: 6px; border-radius: 3px; background: rgba(255, 255, 255, 0.2); }
+  levelbar block.filled { background: white; border-radius: 3px; }
+  levelbar block.empty  { background: transparent; }
 }

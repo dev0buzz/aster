@@ -7,6 +7,8 @@ import Gio from "gi://Gio"
 import Hyprland from "gi://AstalHyprland"
 import Notifd from "gi://AstalNotifd"
 import { toggleCenter } from "./NotificationCenter"
+import SysTray from "./SysTray"
+import ControlCenter from "./ControlCenter"
 
 const hypr = Hyprland.get_default()
 const notifd = Notifd.get_default()
@@ -75,6 +77,8 @@ export default function Bar(gdkmonitor: Gdk.Monitor) {
         </box>
         <box $type="center" />
         <box $type="end">
+	  <SysTray />
+	  <ControlCenter />
           <menubutton class="clock">
             <label label={time} />
             <popover hasArrow={false}>

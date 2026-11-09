@@ -71,3 +71,19 @@ hl.on("hyprland.start", function()
   -- Super+Shift+R: restart the panel while developing
   hl.bind(mainMod .. " + SHIFT + R", hl.dsp.exec_cmd("pkill -f 'ags run'; ags run /home/danim/aster/shell"))
 end)
+
+-- Volume / brightness keys (OSD shows automatically)
+local volUp   = "wpctl set-volume -l 1 @DEFAULT_AUDIO_SINK@ 5%+"
+local volDown = "wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-"
+local mute    = "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle"
+
+hl.bind("XF86AudioRaiseVolume", hl.dsp.exec_cmd(volUp),   { locked = true, repeating = true })
+hl.bind("XF86AudioLowerVolume", hl.dsp.exec_cmd(volDown), { locked = true, repeating = true })
+hl.bind("XF86AudioMute",        hl.dsp.exec_cmd(mute),    { locked = true })
+hl.bind(mainMod .. " + F12", hl.dsp.exec_cmd(volUp),   { repeating = true })
+hl.bind(mainMod .. " + F11", hl.dsp.exec_cmd(volDown), { repeating = true })
+hl.bind(mainMod .. " + F10", hl.dsp.exec_cmd(mute))
+
+-- Brightness: no backlight in the VM; tested on the AMD PC in week 15
+hl.bind("XF86MonBrightnessUp",   hl.dsp.exec_cmd("brightnessctl set 5%+"), { locked = true, repeating = true })
+hl.bind("XF86MonBrightnessDown", hl.dsp.exec_cmd("brightnessctl set 5%-"), { locked = true, repeating = true })
