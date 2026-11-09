@@ -7,6 +7,7 @@ import NotificationCenter from "./widget/NotificationCenter"
 import OSD from "./widget/OSD"
 import Dock from "./widget/Dock"
 import Spotlight from "./widget/Spotlight"
+import Settings from "./widget/Settings"
 
 // Follow the system colour scheme (set by aster-theme)
 const iface = new Gio.Settings({ schema_id: "org.gnome.desktop.interface" })
@@ -27,6 +28,7 @@ app.start({
     OSD()
     Dock()
     Spotlight()
+    Settings()
     iface.connect("changed::color-scheme", applyScheme)
     applyScheme()
   },

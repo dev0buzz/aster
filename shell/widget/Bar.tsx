@@ -15,12 +15,21 @@ const notifd = Notifd.get_default()
 
 // "org.gnome.Nautilus" -> "Files", "firefox" -> "Firefox"
 function appName(cls?: string | null): string {
+  if (cls === "io.Astal.ags") return "Settings"
   if (!cls) return "Aster"
   try {
     const info = Gio.DesktopAppInfo.new(`${cls}.desktop`)
     if (info) return info.get_name()
   } catch {}
   return cls.charAt(0).toUpperCase() + cls.slice(1)
+}
+
+// Shell windows (Settings) and apps without a class: fall back to the title
+function appNameFor(c: Hyprland.Client | null): string {
+  if (!c) return "Aster"
+  if (c.title === "Aster Settings" || c.class === "io.Astal.ags") return "Settings"
+  if (!c.class) return c.title || "Aster"
+  return appName(c.class)
 }
 
 function run(cmd: string) {
@@ -42,7 +51,7 @@ function AsterMenu() {
       <popover hasArrow={false}>
         <box class="menu" orientation={Gtk.Orientation.VERTICAL}>
           <MenuItem label="About This Computer" cmd="foot -e sh -c 'cat /etc/os-release; read'" />
-          <MenuItem label="Settings…" cmd="foot" />
+          <MenuItem label="Settings…" cmd="ags toggle settings" />
           <Gtk.Separator />
           <MenuItem label="Sleep" cmd="systemctl suspend" />
           <MenuItem label="Restart…" cmd="systemctl reboot" />
@@ -73,7 +82,7 @@ export default function Bar(gdkmonitor: Gdk.Monitor) {
       <centerbox>
         <box $type="start">
           <AsterMenu />
-          <label class="app-name" label={focused((c) => appName(c?.class))} />
+          <label class="app-name" label={focused((c) => appNameFor(c))} />
         </box>
         <box $type="center" />
         <box $type="end">

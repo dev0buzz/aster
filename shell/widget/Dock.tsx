@@ -30,6 +30,8 @@ function savePinned(list: string[]) {
 
 // ---------- helpers ----------
 const same = (a?: string | null, b?: string | null) => !!a && !!b && a.toLowerCase() === b.toLowerCase()
+// The Settings window belongs to the shell process; show it as "aster-settings"
+const classOf = (c: Hyprland.Client) => (c.class === "io.Astal.ags" ? "aster-settings" : c.class)
 
 function appInfo(id: string): Gio.DesktopAppInfo | null {
   // 1) exact desktop file: "<id>.desktop"
@@ -57,7 +59,7 @@ function launch(id: string) {
   dispatch(`hl.dsp.exec_cmd(${JSON.stringify(cmd)})`)
 }
 
-const windowsOf = (id: string) => hypr.get_clients().filter((c) => same(c.class, id))
+const windowsOf = (id: string) => hypr.get_clients().filter((c) => same(classOf(c), id))
 const dispatch = (lua: string) => execAsync(["hyprctl", "dispatch", lua]).catch(console.error)
 
 function focusClient(c: Hyprland.Client) {
@@ -80,7 +82,7 @@ function refresh() {
   const p = pinned.get()
   const running: string[] = []
   for (const c of hypr.get_clients())
-    if (c.class && !running.some((r) => same(r, c.class))) running.push(c.class)
+    if (classOf(c) && !running.some((r) => same(r, classOf(c)))) running.push(classOf(c))
   const extra = running.filter((r) => !p.some((x) => same(x, r)))
   setItems([
     ...p.map((id) => ({ id })),
@@ -152,7 +154,7 @@ function attachMenu(anchor: Gtk.Widget, id: string) {
 // ---------- one dock icon ----------
 function DockItem({ id }: { id: string }) {
   const info = appInfo(id)
-  const wins = createBinding(hypr, "clients")((cs) => cs.filter((c) => same(c.class, id)))
+  const wins = createBinding(hypr, "clients")((cs) => cs.filter((c) => same(classOf(c), id)))
   const badge = badges((all) => findBadge(all, id))
 
   const onClick = () => {
