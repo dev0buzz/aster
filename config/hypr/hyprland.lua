@@ -7,7 +7,7 @@ local terminal = "kitty"
 local files    = "nautilus"
 local launcher = "fuzzel"         -- temporary, replaced in week 9
 
-hl.env("GSK_RENDERER", "cairo")   -- VMware only: remove on the real AMD PC
+hl.env("LIBGL_ALWAYS_SOFTWARE", "1")   -- VMware only: Hyprland can't import vmwgfx GPU buffers. REMOVE on the AMD PC.
 hl.env("XCURSOR_SIZE", "24")
 hl.env("HYPRCURSOR_SIZE", "24")
 
