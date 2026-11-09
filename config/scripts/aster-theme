@@ -1,0 +1,41 @@
+#!/bin/sh
+# aster-theme light | dark | toggle | get
+set -e
+STATE="${XDG_STATE_HOME:-$HOME/.local/state}/aster/theme"
+mkdir -p "$(dirname "$STATE")"
+cur=$(cat "$STATE" 2>/dev/null || echo light)
+mode="${1:-get}"
+
+if [ "$mode" = get ]; then echo "$cur"; exit 0; fi
+if [ "$mode" = toggle ]; then [ "$cur" = dark ] && mode=light || mode=dark; fi
+
+case "$mode" in
+  light) V=Light; SCHEME=default;     ICONS=WhiteSur-light ;;
+  dark)  V=Dark;  SCHEME=prefer-dark; ICONS=WhiteSur-dark ;;
+  *) echo "usage: aster-theme light|dark|toggle|get"; exit 1 ;;
+esac
+
+# 1) GTK3 apps + the colour-scheme hint (libadwaita, Firefox, Flatpaks follow it)
+gsettings set org.gnome.desktop.interface color-scheme "$SCHEME"
+gsettings set org.gnome.desktop.interface gtk-theme    "WhiteSur-$V"
+gsettings set org.gnome.desktop.interface icon-theme   "$ICONS"
+gsettings set org.gnome.desktop.interface cursor-theme "WhiteSur-cursors"
+gsettings set org.gnome.desktop.interface font-name    "Inter 11"
+
+# 2) GTK4 / libadwaita apps read ~/.config/gtk-4.0 (link EVERYTHING the theme ships)
+SRC="$HOME/.themes/WhiteSur-$V/gtk-4.0"
+DST="$HOME/.config/gtk-4.0"
+mkdir -p "$DST"
+for f in "$SRC"/*; do
+  rm -rf "$DST/$(basename "$f")"
+  ln -sfn "$f" "$DST/$(basename "$f")"
+done
+
+# mac-style window buttons: close, minimize, maximize on the left
+gsettings set org.gnome.desktop.wm.preferences button-layout "close,minimize,maximize:"
+
+# 3) Hyprland's own cursor
+hyprctl setcursor WhiteSur-cursors 24 >/dev/null 2>&1 || true
+
+echo "$mode" > "$STATE"
+echo "Aster theme: $mode"

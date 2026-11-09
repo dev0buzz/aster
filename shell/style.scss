@@ -175,3 +175,48 @@ popover .dock-menu separator { margin: 4px 8px; }
   progress { min-height: 5px; border-radius: 3px; background: #0a84ff; }
 }
 .dock-item.urgent .dock-btn { background: rgba(255, 59, 48, 0.22); }
+
+// ---- Dark mode (week 8): active when windows carry the "dark" class ----
+window.Bar.dark {
+  background: rgba(30, 30, 30, 0.85);
+  color: #f5f5f7;
+  button:hover { background: rgba(255, 255, 255, 0.10); }
+}
+window.Dock.dark {
+  .dock { background: rgba(40, 40, 40, 0.55); border-color: rgba(255, 255, 255, 0.12); }
+  .dock-btn:hover { background: rgba(255, 255, 255, 0.10); }
+  .dot { background: rgba(255, 255, 255, 0.75); }
+  .dock-sep { background: rgba(255, 255, 255, 0.20); }
+}
+window.dark .notif {
+  background: rgba(40, 40, 40, 0.94);
+  color: #f5f5f7;
+  .app, .time { color: rgba(255, 255, 255, 0.55); }
+}
+window.dark .center {
+  background: rgba(30, 30, 30, 0.96);
+  color: #f5f5f7;
+  .empty { color: rgba(255, 255, 255, 0.5); }
+  .group-title { color: rgba(255, 255, 255, 0.6); }
+}
+
+// ---- Aster popovers: own colours, independent of the GTK theme (week 8) ----
+window popover > contents {
+  background: rgba(246, 246, 246, 0.97);
+  color: #1d1d1f;
+  border-radius: 14px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.25);
+}
+window.dark popover > contents {
+  background: rgba(38, 38, 40, 0.97);
+  color: #f5f5f7;
+  border-color: rgba(255, 255, 255, 0.10);
+}
+window.dark popover label,
+window.dark popover button { color: #f5f5f7; }
+window.dark popover calendar { background: transparent; color: #f5f5f7; }
+
+// Panel text and icons: full contrast in both modes
+window.Bar button, window.Bar menubutton > button { color: #1d1d1f; }
+window.Bar.dark button, window.Bar.dark menubutton > button { color: #f5f5f7; }

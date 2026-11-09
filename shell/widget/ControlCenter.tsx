@@ -6,6 +6,7 @@ import Wp from "gi://AstalWp"
 import Network from "gi://AstalNetwork"
 import Bluetooth from "gi://AstalBluetooth"
 import Mpris from "gi://AstalMpris"
+import Gio from "gi://Gio"
 
 const V = Gtk.Orientation.VERTICAL
 const wp = Wp.get_default()!
@@ -81,7 +82,12 @@ function BluetoothTile() {
 }
 
 // Placeholder until week 8: only flips the app colour scheme
-const [dark, setDark] = createState(false)
+// Dark Mode: reads the real system setting, switches via aster-theme
+const iface = new Gio.Settings({ schema_id: "org.gnome.desktop.interface" })
+const isDark = () => iface.get_string("color-scheme") === "prefer-dark"
+const [dark, setDark] = createState(isDark())
+iface.connect("changed::color-scheme", () => setDark(isDark()))
+
 function DarkTile() {
   return (
     <Tile
@@ -89,11 +95,7 @@ function DarkTile() {
       title="Dark Mode"
       subtitle={dark((d) => (d ? "On" : "Off"))}
       active={dark}
-      onClicked={() => {
-        const next = !dark.get()
-        setDark(next)
-        sh(`gsettings set org.gnome.desktop.interface color-scheme ${next ? "prefer-dark" : "default"}`)
-      }}
+      onClicked={() => sh("/home/danim/aster/config/scripts/aster-theme toggle")}
     />
   )
 }

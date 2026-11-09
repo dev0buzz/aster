@@ -10,6 +10,9 @@ local launcher = "fuzzel"         -- temporary, replaced in week 9
 hl.env("LIBGL_ALWAYS_SOFTWARE", "1")   -- VMware only: Hyprland can't import vmwgfx GPU buffers. REMOVE on the AMD PC.
 hl.env("XCURSOR_SIZE", "24")
 hl.env("HYPRCURSOR_SIZE", "24")
+hl.env("XCURSOR_THEME", "WhiteSur-cursors")
+hl.env("XCURSOR_SIZE", "24")
+
 
 hl.config({
   cursor = { no_hardware_cursors = true },   -- needed in VMware
@@ -67,6 +70,7 @@ end
 -- Autostart
 hl.on("hyprland.start", function()
   hl.exec_cmd("dbus-update-activation-environment --systemd --all")
+  hl.exec_cmd("sh -c '/home/danim/aster/config/scripts/aster-theme $(/home/danim/aster/config/scripts/aster-theme get)'")
   hl.exec_cmd("/usr/libexec/polkit-mate-authentication-agent-1")
   hl.exec_cmd("ags run /home/danim/aster/shell")
 end)
