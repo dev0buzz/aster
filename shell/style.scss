@@ -220,3 +220,37 @@ window.dark popover calendar { background: transparent; color: #f5f5f7; }
 // Panel text and icons: full contrast in both modes
 window.Bar button, window.Bar menubutton > button { color: #1d1d1f; }
 window.Bar.dark button, window.Bar.dark menubutton > button { color: #f5f5f7; }
+
+// ---- Spotlight (week 9) ----
+window.Spotlight { background: transparent; }
+.spotlight {
+  background: rgba(246, 246, 246, 0.97);
+  color: #1d1d1f;
+  border-radius: 18px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.35);
+  padding: 8px;
+  margin: 30px;   // room for the shadow
+  font-family: "Inter", sans-serif;
+}
+.spot-search {
+  padding: 6px 10px;
+  entry { background: transparent; border: none; box-shadow: none; outline: none; font-size: 22px; min-height: 36px; }
+}
+.spot-results { margin-top: 6px; padding-top: 6px; border-top: 1px solid rgba(0, 0, 0, 0.08); }
+.spot-row {
+  background: transparent; border: none; box-shadow: none;
+  border-radius: 10px; padding: 6px 10px;
+}
+.spot-row:hover, .spot-row.first {
+  background: #0a84ff; color: white;
+  .spot-sub { color: rgba(255, 255, 255, 0.8); }
+}
+.spot-title { font-size: 14px; font-weight: 600; }
+.spot-sub   { font-size: 11px; color: rgba(0, 0, 0, 0.55); }
+
+window.Spotlight.dark {
+  .spotlight { background: rgba(38, 38, 40, 0.97); color: #f5f5f7; border-color: rgba(255, 255, 255, 0.10); }
+  .spot-results { border-top-color: rgba(255, 255, 255, 0.10); }
+  .spot-sub { color: rgba(255, 255, 255, 0.55); }
+}

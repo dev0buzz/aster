@@ -6,6 +6,7 @@ import GLib from "gi://GLib"
 import Gio from "gi://Gio"
 import Hyprland from "gi://AstalHyprland"
 import { badges, findBadge } from "../lib/badges"
+import GLib from "gi://GLib"
 
 const hypr = Hyprland.get_default()
 const V = Gtk.Orientation.VERTICAL
@@ -70,6 +71,11 @@ const [pinned, setPinnedState] = createState<string[]>(loadPinned())
 type Item = { id: string; sep?: boolean }
 const [items, setItems] = createState<Item[]>([])
 
+// Layer windows grow on their own but don't shrink: recompute after the list changes
+let dockWin: Astal.Window | null = null
+const shrinkDock = () =>
+  GLib.idle_add(GLib.PRIORITY_DEFAULT_IDLE, () => { dockWin?.set_default_size(1, 1); return false })
+
 function refresh() {
   const p = pinned.get()
   const running: string[] = []
@@ -81,12 +87,15 @@ function refresh() {
     ...(extra.length ? [{ id: "__sep__", sep: true }] : []),
     ...extra.map((id) => ({ id })),
   ])
+  shrinkDock()
 }
+
 function setPinned(list: string[]) {
   setPinnedState(list)
   savePinned(list)
   refresh()
 }
+
 hypr.connect("notify::clients", refresh)
 hypr.connect("client-added", refresh)
 hypr.connect("client-removed", refresh)
@@ -208,6 +217,7 @@ export default function Dock() {
       exclusivity={Astal.Exclusivity.EXCLUSIVE}
       marginBottom={6}
       application={app}
+      $={(self: Astal.Window) => (dockWin = self)}
     >
       <box class="dock" spacing={4}>
         <For each={items}>

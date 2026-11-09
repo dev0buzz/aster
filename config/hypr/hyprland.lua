@@ -5,7 +5,6 @@ hl.monitor({ output = "Virtual-1", mode = "1600x900@60", position = "0x0", scale
 local mainMod  = "SUPER"          -- Super acts as Cmd
 local terminal = "kitty"
 local files    = "nautilus"
-local launcher = "fuzzel"         -- temporary, replaced in week 9
 
 hl.env("LIBGL_ALWAYS_SOFTWARE", "1")   -- VMware only: Hyprland can't import vmwgfx GPU buffers. REMOVE on the AMD PC.
 hl.env("XCURSOR_SIZE", "24")
@@ -55,7 +54,7 @@ hl.animation({ leaf = "workspaces", enabled = true, speed = 4, bezier = "macOut"
 hl.bind(mainMod .. " + SHIFT + R", hl.dsp.exec_cmd("/home/danim/aster/config/scripts/aster-panel-restart"))
 hl.bind(mainMod .. " + Q",       hl.dsp.window.close())          -- Cmd+Q quit
 hl.bind(mainMod .. " + W",       hl.dsp.window.close())          -- Cmd+W close
-hl.bind(mainMod .. " + space",   hl.dsp.exec_cmd(launcher))      -- Cmd+Space
+hl.bind(mainMod .. " + space", hl.dsp.exec_cmd("ags toggle spotlight"))
 hl.bind(mainMod .. " + Return",  hl.dsp.exec_cmd(terminal))
 hl.bind(mainMod .. " + E",       hl.dsp.exec_cmd(files))
 hl.bind(mainMod .. " + T",       hl.dsp.window.float({ action = "toggle" }))  -- tile/float
@@ -70,6 +69,7 @@ end
 -- Autostart
 hl.on("hyprland.start", function()
   hl.exec_cmd("dbus-update-activation-environment --systemd --all")
+  hl.exec_cmd("dbus-update-activation-environment --systemd LIBGL_ALWAYS_SOFTWARE=1")  -- VMware only: REMOVE on the AMD PC
   hl.exec_cmd("sh -c '/home/danim/aster/config/scripts/aster-theme $(/home/danim/aster/config/scripts/aster-theme get)'")
   hl.exec_cmd("/usr/libexec/polkit-mate-authentication-agent-1")
   hl.exec_cmd("ags run /home/danim/aster/shell")
