@@ -5,8 +5,11 @@ import { createPoll } from "ags/time"
 import { createBinding } from "ags"
 import Gio from "gi://Gio"
 import Hyprland from "gi://AstalHyprland"
+import Notifd from "gi://AstalNotifd"
+import { toggleCenter } from "./NotificationCenter"
 
 const hypr = Hyprland.get_default()
+const notifd = Notifd.get_default()
 
 // "org.gnome.Nautilus" -> "Files", "firefox" -> "Firefox"
 function appName(cls?: string | null): string {
@@ -78,6 +81,19 @@ export default function Bar(gdkmonitor: Gdk.Monitor) {
               <Gtk.Calendar />
             </popover>
           </menubutton>
+          <button class="bell" onClicked={toggleCenter}>
+            <box spacing={4}>
+              <image
+                iconName={createBinding(notifd, "dontDisturb")((d) =>
+                  d ? "notifications-disabled-symbolic" : "preferences-system-notifications-symbolic",
+                )}
+              />
+              <label
+                label={createBinding(notifd, "notifications")((ns) => `${ns.length}`)}
+                visible={createBinding(notifd, "notifications")((ns) => ns.length > 0)}
+              />
+            </box>
+          </button>
         </box>
       </centerbox>
     </window>
