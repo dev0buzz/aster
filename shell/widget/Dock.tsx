@@ -16,16 +16,21 @@ const CONF_DIR = `${GLib.get_user_config_dir()}/aster`
 const CONF = `${CONF_DIR}/dock.json`
 const DEFAULT_PINNED = ["org.mozilla.firefox", "org.gnome.Nautilus", "kitty"]
 
-function loadPinned(): string[] {
+type DockConf = { pinned: string[]; iconSize: number }
+function loadConf(): DockConf {
   try {
     const [ok, bytes] = GLib.file_get_contents(CONF)
-    if (ok) return JSON.parse(new TextDecoder().decode(bytes)).pinned
+    if (ok) {
+      const c = JSON.parse(new TextDecoder().decode(bytes))
+      return { pinned: c.pinned ?? DEFAULT_PINNED, iconSize: c.iconSize ?? 48 }
+    }
   } catch {}
-  return DEFAULT_PINNED
+  return { pinned: DEFAULT_PINNED, iconSize: 48 }
 }
-function savePinned(list: string[]) {
+const conf = loadConf()
+function saveConf() {
   GLib.mkdir_with_parents(CONF_DIR, 0o755)
-  GLib.file_set_contents(CONF, JSON.stringify({ pinned: list }, null, 2))
+  GLib.file_set_contents(CONF, JSON.stringify({ pinned: pinned.get(), iconSize: iconSize.get() }, null, 2))
 }
 
 // ---------- helpers ----------
@@ -69,7 +74,8 @@ function focusClient(c: Hyprland.Client) {
 }
 
 // ---------- dock contents ----------
-const [pinned, setPinnedState] = createState<string[]>(loadPinned())
+const [pinned, setPinnedState] = createState<string[]>(conf.pinned)
+const [iconSize, setIconSizeState] = createState<number>(conf.iconSize)
 type Item = { id: string; sep?: boolean }
 const [items, setItems] = createState<Item[]>([])
 
@@ -94,8 +100,13 @@ function refresh() {
 
 function setPinned(list: string[]) {
   setPinnedState(list)
-  savePinned(list)
+  saveConf()
   refresh()
+}
+function setIconSize(px: number) {
+  setIconSizeState(px)
+  saveConf()
+  shrinkDock()
 }
 
 hypr.connect("notify::clients", refresh)
@@ -166,8 +177,8 @@ function DockItem({ id }: { id: string }) {
   }
 
   const icon = info
-    ? <image gicon={info.get_icon()!} pixelSize={48} />
-    : <image iconName="application-x-executable" pixelSize={48} />
+    ? <image gicon={info.get_icon()!} pixelSize={iconSize} />
+    : <image iconName="application-x-executable" pixelSize={iconSize} />
   const count = (
     <label
       class="badge"
@@ -229,3 +240,5 @@ export default function Dock() {
     </window>
   )
 }
+
+export { pinned, setPinned, iconSize, setIconSize, appInfo }

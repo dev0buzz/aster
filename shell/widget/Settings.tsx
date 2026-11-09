@@ -1,6 +1,7 @@
+import { pinned, setPinned, iconSize, setIconSize, appInfo } from "./Dock"
 import app from "ags/gtk4/app"
 import { Gtk, Gdk } from "ags/gtk4"
-import { createState } from "ags"
+import { createState, For } from "ags"
 import { execAsync } from "ags/process"
 import GLib from "gi://GLib"
 import Gio from "gi://Gio"
@@ -92,6 +93,64 @@ const PAGES: [string, string, string][] = [
   ["apps", "Default Apps", "application-x-executable-symbolic"],
 ]
 
+function movePin(id: string, delta: number) {
+  const list = [...pinned.get()]
+  const i = list.indexOf(id)
+  const j = i + delta
+  if (i < 0 || j < 0 || j >= list.length) return
+  ;[list[i], list[j]] = [list[j], list[i]]
+  setPinned(list)
+}
+
+function DockPage() {
+  return (
+    <box orientation={V} spacing={18}>
+      <label class="page-title" label="Dock" xalign={0} />
+
+      <label class="section-title" label="Icon size" xalign={0} />
+      <box spacing={10}>
+        <label class="hint" label="Small" />
+        <Gtk.Scale
+          hexpand
+          drawValue={false}
+          $={(s: Gtk.Scale) => {
+            s.set_range(32, 72)
+            s.set_increments(4, 8)
+            s.set_value(iconSize.get())
+            s.connect("value-changed", () => setIconSize(Math.round(s.get_value())))
+          }}
+        />
+        <label class="hint" label="Large" />
+      </box>
+
+      <label class="section-title" label="Pinned apps" xalign={0} />
+      <box class="pin-list" orientation={V}>
+        <For each={pinned}>
+          {(id) => {
+            const info = appInfo(id)
+            return (
+              <box class="pin-row" spacing={10}>
+                {info ? <image gicon={info.get_icon()!} pixelSize={28} /> : <image iconName="application-x-executable" pixelSize={28} />}
+                <label label={info?.get_name() ?? id} hexpand xalign={0} />
+                <button class="pin-btn" tooltipText="Move up" onClicked={() => movePin(id, -1)}>
+                  <image iconName="go-up-symbolic" />
+                </button>
+                <button class="pin-btn" tooltipText="Move down" onClicked={() => movePin(id, 1)}>
+                  <image iconName="go-down-symbolic" />
+                </button>
+                <button class="pin-btn" tooltipText="Remove from Dock" onClicked={() => setPinned(pinned.get().filter((p) => p !== id))}>
+                  <image iconName="list-remove-symbolic" />
+                </button>
+              </box>
+            )
+          }}
+        </For>
+      </box>
+      <label class="hint" label="To add an app: right-click it in the dock → Keep in Dock." xalign={0} />
+    </box>
+  )
+}
+
 export default function Settings() {
   const [page, setPage] = createState("appearance")
   return (
@@ -120,7 +179,10 @@ export default function Settings() {
               <label class="section-title" label="Dark wallpaper" xalign={0} />
               <WallGrid mode="dark" />
             </box>
-            <label class="soon" label="Coming soon" visible={page((p) => p !== "appearance")} />
+            <box visible={page((p) => p === "dock")}>
+              <DockPage />
+            </box>
+            <label class="soon" label="Coming soon" visible={page((p) => p === "displays" || p === "apps")} />
           </box>
         </Gtk.ScrolledWindow>
       </box>
