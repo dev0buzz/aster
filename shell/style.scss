@@ -294,3 +294,14 @@ window.Settings.dark {
   .pin-list { background: rgba(255, 255, 255, 0.05); }
   .pin-row:hover, .pin-btn:hover { background: rgba(255, 255, 255, 0.08); }
 }
+
+// ---- Settings: dropdowns follow Aster light/dark ----
+window.Settings dropdown > button {
+  background: tint(0.10);
+  color: inherit;
+  border: none;
+  box-shadow: none;
+  border-radius: 8px;
+  padding: 2px 10px;
+}
+window.Settings dropdown > button:hover { background: tint(0.16); }

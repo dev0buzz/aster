@@ -151,6 +151,48 @@ function DockPage() {
   )
 }
 
+// ---------- Default Apps ----------
+const GROUPS: [string, string, string[]][] = [
+  ["Web browser", "web-browser-symbolic", ["x-scheme-handler/http", "x-scheme-handler/https", "text/html"]],
+  ["Files", "system-file-manager-symbolic", ["inode/directory"]],
+  ["Text editor", "accessories-text-editor-symbolic", ["text/plain", "text/markdown"]],
+  ["Images", "image-x-generic-symbolic", ["image/jpeg", "image/png", "image/webp", "image/gif"]],
+]
+
+function DefaultRow({ title, icon, mimes }: { title: string; icon: string; mimes: string[] }) {
+  const apps = Gio.AppInfo.get_all_for_type(mimes[0]).filter((a) => a.should_show())
+  const cur = Gio.AppInfo.get_default_for_type(mimes[0], false)
+  return (
+    <box class="pin-row" spacing={10}>
+      <image iconName={icon} />
+      <label label={title} hexpand xalign={0} />
+      <Gtk.DropDown
+        $={(dd: Gtk.DropDown) => {
+          dd.set_model(Gtk.StringList.new(apps.map((a) => a.get_display_name())))
+          const i = apps.findIndex((a) => cur && a.get_id() === cur.get_id())
+          if (i >= 0) dd.set_selected(i)
+          dd.connect("notify::selected", () => {
+            const a = apps[dd.get_selected()]
+            if (a) for (const m of mimes) a.set_as_default_for_type(m)
+          })
+        }}
+      />
+    </box>
+  )
+}
+
+function AppsPage() {
+  return (
+    <box orientation={V} spacing={18}>
+      <label class="page-title" label="Default Apps" xalign={0} />
+      <box class="pin-list" orientation={V}>
+        {GROUPS.map(([t, i, m]) => <DefaultRow title={t} icon={i} mimes={m} />)}
+      </box>
+      <label class="hint" label="Used when you open a file or link from any app." xalign={0} />
+    </box>
+  )
+}
+
 export default function Settings() {
   const [page, setPage] = createState("appearance")
   return (
@@ -182,7 +224,10 @@ export default function Settings() {
             <box visible={page((p) => p === "dock")}>
               <DockPage />
             </box>
-            <label class="soon" label="Coming soon" visible={page((p) => p === "displays" || p === "apps")} />
+            <box visible={page((p) => p === "apps")}>
+              <AppsPage />
+            </box>
+            <label class="soon" label="Coming soon" visible={page((p) => p === "displays")} />
           </box>
         </Gtk.ScrolledWindow>
       </box>
