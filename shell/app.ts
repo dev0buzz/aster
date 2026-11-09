@@ -4,6 +4,7 @@ import Bar from "./widget/Bar"
 import NotificationPopups from "./widget/NotificationPopups"
 import NotificationCenter from "./widget/NotificationCenter"
 import OSD from "./widget/OSD"
+import Dock from "./widget/Dock"
 
 app.start({
   css: style,
@@ -12,5 +13,6 @@ app.start({
     NotificationPopups()
     NotificationCenter()
     OSD()
+    Dock()
   },
 })

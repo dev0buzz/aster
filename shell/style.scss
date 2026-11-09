@@ -129,3 +129,31 @@ window.OSD { background: transparent; }
   levelbar block.filled { background: white; border-radius: 3px; }
   levelbar block.empty  { background: transparent; }
 }
+
+// ---- Dock (week 6) ----
+window.Dock { background: transparent; }
+.dock {
+  background: rgba(246, 246, 246, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  border-radius: 20px;
+  padding: 6px 8px 3px 8px;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.30);
+}
+.dock-btn {
+  background: transparent; border: none; box-shadow: none;
+  padding: 2px; border-radius: 12px;
+}
+.dock-btn:hover { background: rgba(0, 0, 0, 0.08); }
+.dot {
+  min-width: 4px; min-height: 4px; border-radius: 2px;
+  background: rgba(0, 0, 0, 0.65);
+  margin-top: 2px;
+}
+.dock-sep { min-width: 1px; margin: 8px 4px; background: rgba(0, 0, 0, 0.18); }
+popover .dock-menu {
+  padding: 4px; min-width: 170px;
+  button { padding: 4px 12px; border-radius: 5px; background: transparent; border: none; box-shadow: none; }
+  button:hover { background: tint(0.10); }
+  .dock-menu-title { font-weight: 700; padding: 4px 12px; opacity: 0.7; }
+}
+popover .dock-menu separator { margin: 4px 8px; }
