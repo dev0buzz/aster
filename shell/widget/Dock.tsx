@@ -5,6 +5,7 @@ import { execAsync } from "ags/process"
 import GLib from "gi://GLib"
 import Gio from "gi://Gio"
 import Hyprland from "gi://AstalHyprland"
+import { badges, findBadge } from "../lib/badges"
 
 const hypr = Hyprland.get_default()
 const V = Gtk.Orientation.VERTICAL
@@ -143,19 +144,54 @@ function attachMenu(anchor: Gtk.Widget, id: string) {
 function DockItem({ id }: { id: string }) {
   const info = appInfo(id)
   const wins = createBinding(hypr, "clients")((cs) => cs.filter((c) => same(c.class, id)))
+  const badge = badges((all) => findBadge(all, id))
 
   const onClick = () => {
     const list = windowsOf(id)
     if (list.length === 0) return launch(id)
     const f = hypr.focusedClient
     const i = list.findIndex((c) => f && c.address === f.address)
-    focusClient(list[(i + 1) % list.length]) // not focused -> first; focused -> next
+    focusClient(list[(i + 1) % list.length])
   }
 
+  const icon = info
+    ? <image gicon={info.get_icon()!} pixelSize={48} />
+    : <image iconName="application-x-executable" pixelSize={48} />
+  const count = (
+    <label
+      class="badge"
+      halign={Gtk.Align.END}
+      valign={Gtk.Align.START}
+      label={badge((b) => (b.count > 99 ? "99+" : `${b.count}`))}
+      visible={badge((b) => b.count > 0)}
+    />
+  )
+  const bar = (
+    <Gtk.ProgressBar
+      class="dock-progress"
+      valign={Gtk.Align.END}
+      marginBottom={4}
+      marginStart={6}
+      marginEnd={6}
+      fraction={badge((b) => b.progress ?? 0)}
+      visible={badge((b) => b.progress !== null)}
+    />
+  )
+
   return (
-    <box class="dock-item" orientation={V} $={(self: Gtk.Box) => attachMenu(self, id)}>
+    <box
+      class={badge((b) => (b.urgent ? "dock-item urgent" : "dock-item"))}
+      orientation={V}
+      $={(self: Gtk.Box) => attachMenu(self, id)}
+    >
       <button class="dock-btn" tooltipText={info?.get_name() ?? id} onClicked={onClick}>
-        {info ? <image gicon={info.get_icon()!} pixelSize={48} /> : <image iconName="application-x-executable" pixelSize={48} />}
+        <Gtk.Overlay
+          $={(o: Gtk.Overlay) => {
+            o.set_child(icon as Gtk.Widget)
+            o.add_overlay(count as Gtk.Widget)
+            o.add_overlay(bar as Gtk.Widget)
+          }}
+        />
       </button>
       <box class="dot" halign={Gtk.Align.CENTER} visible={wins((w) => w.length > 0)} />
     </box>
