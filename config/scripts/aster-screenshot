@@ -1,0 +1,16 @@
+#!/bin/sh
+# aster-screenshot full | region | annotate
+PICS="$(xdg-user-dir PICTURES 2>/dev/null)"; [ -n "$PICS" ] || PICS="$HOME/Pictures"
+DIR="$PICS/Screenshots"; mkdir -p "$DIR"
+FILE="$DIR/Screenshot $(date '+%Y-%m-%d at %H.%M.%S').png"
+
+case "${1:-region}" in
+  full)     grim "$FILE" ;;
+  region)   GEOM=$(slurp) || exit 0; grim -g "$GEOM" "$FILE" ;;
+  annotate) GEOM=$(slurp) || exit 0; grim -g "$GEOM" - | swappy -f - -o "$FILE" ;;
+esac
+
+[ -f "$FILE" ] || exit 0           # cancelled (Escape in slurp/swappy)
+wl-copy < "$FILE"
+notify-send -a Screenshot -i camera-photo -h "string:image-path:$FILE" \
+  "Screenshot saved" "$(basename "$FILE")"

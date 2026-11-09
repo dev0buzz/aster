@@ -90,3 +90,10 @@ hl.bind(mainMod .. " + F10", hl.dsp.exec_cmd(mute))
 -- Brightness: no backlight in the VM; tested on the AMD PC in week 15
 hl.bind("XF86MonBrightnessUp",   hl.dsp.exec_cmd("brightnessctl set 5%+"), { locked = true, repeating = true })
 hl.bind("XF86MonBrightnessDown", hl.dsp.exec_cmd("brightnessctl set 5%-"), { locked = true, repeating = true })
+
+-- Screenshots (Ctrl+Shift like macOS's Cmd+Shift; Super+Shift+N moves windows)
+local shot = "/home/danim/aster/config/scripts/aster-screenshot"
+hl.bind("CTRL + SHIFT + 3", hl.dsp.exec_cmd(shot .. " full"))
+hl.bind("CTRL + SHIFT + 4", hl.dsp.exec_cmd(shot .. " region"))
+hl.bind("CTRL + SHIFT + 5", hl.dsp.exec_cmd(shot .. " annotate"))
+hl.bind("Print",            hl.dsp.exec_cmd(shot .. " full"))
