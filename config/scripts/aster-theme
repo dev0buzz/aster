@@ -37,5 +37,12 @@ gsettings set org.gnome.desktop.wm.preferences button-layout "close,minimize,max
 # 3) Hyprland's own cursor
 hyprctl setcursor WhiteSur-cursors 24 >/dev/null 2>&1 || true
 
+# 4) Wallpaper: ~/aster/wallpapers/light.jpg or dark.jpg
+WALL="$HOME/aster/wallpapers/$mode.jpg"
+if [ -f "$WALL" ]; then
+  pkill -x swaybg 2>/dev/null || true
+  setsid swaybg -i "$WALL" -m fill >/dev/null 2>&1 &
+fi
+
 echo "$mode" > "$STATE"
 echo "Aster theme: $mode"
