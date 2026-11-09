@@ -2,6 +2,11 @@
 -- VMware screen: real pixels, no 2x scaling
 hl.monitor({ output = "Virtual-1", mode = "1600x900@60", position = "0x0", scale = 1 })
 
+-- Monitor settings saved by Aster Settings (override the line above)
+local monConf = os.getenv("HOME") .. "/.config/aster/monitors.lua"
+local f = io.open(monConf, "r")
+if f then f:close(); dofile(monConf) end
+
 local mainMod  = "SUPER"          -- Super acts as Cmd
 local terminal = "kitty"
 local files    = "nautilus"

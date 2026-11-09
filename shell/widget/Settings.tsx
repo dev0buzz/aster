@@ -193,6 +193,93 @@ function AppsPage() {
   )
 }
 
+// ---------- Displays ----------
+type Mon = { name: string; description: string; width: number; height: number; refreshRate: number;
+             scale: number; x: number; y: number; availableModes: string[] }
+const MONCONF = `${HOME}/.config/aster/monitors.lua`
+const SCALES = [1, 1.25, 1.5, 2]
+const [mons, setMons] = createState<Mon[]>([])
+const reloadMons = () =>
+  execAsync(["hyprctl", "monitors", "-j"]).then((out) => setMons(JSON.parse(out))).catch(console.error)
+
+const luaFor = (m: Mon, mode: string, scale: number) =>
+  `hl.monitor({ output = "${m.name}", mode = "${mode}", position = "${m.x}x${m.y}", scale = ${scale} })`
+
+async function applyMonitor(m: Mon, mode: string, scale: number) {
+  const line = luaFor(m, mode, scale)
+  const res = await execAsync(["hyprctl", "eval", line])
+  if (res.trim() !== "ok") console.error("hyprctl eval:", res)
+  // Save: keep other monitors' lines, replace this one
+  let lines: string[] = []
+  try {
+    const [ok, b] = GLib.file_get_contents(MONCONF)
+    if (ok) lines = new TextDecoder().decode(b).split("\n")
+      .filter((l) => l.startsWith("hl.monitor") && !l.includes(`output = "${m.name}"`))
+  } catch {}
+  lines.push(line)
+  GLib.mkdir_with_parents(`${HOME}/.config/aster`, 0o755)
+  GLib.file_set_contents(MONCONF, "-- written by Aster Settings\n" + lines.join("\n") + "\n")
+}
+
+function MonitorCard({ m }: { m: Mon }) {
+  // "1920x1080@60.00Hz" -> unique "1920x1080@60.00", biggest first
+  const modes = [...new Set(m.availableModes.map((s) => s.replace(/Hz$/, "")))]
+    .sort((a, b) => {
+      const [aw, ah] = a.split("@")[0].split("x").map(Number)
+      const [bw, bh] = b.split("@")[0].split("x").map(Number)
+      return bw * bh - aw * ah || parseFloat(b.split("@")[1]) - parseFloat(a.split("@")[1])
+    })
+  const label = (s: string) => {
+    const [res, hz] = s.split("@")
+    return `${res.replace("x", " × ")} @ ${Math.round(parseFloat(hz))} Hz`
+  }
+  let modeSel = Math.max(0, modes.findIndex((s) => s.startsWith(`${m.width}x${m.height}@`)))
+  let scaleSel = Math.max(0, SCALES.findIndex((s) => Math.abs(s - m.scale) < 0.01))
+
+  return (
+    <box class="pin-list mon-card" orientation={V} spacing={10}>
+      <box spacing={10}>
+        <image iconName="video-display-symbolic" pixelSize={28} />
+        <box orientation={V}>
+          <label class="section-title" label={m.name} xalign={0} />
+          <label class="hint" label={m.description || "Display"} xalign={0} />
+        </box>
+      </box>
+      <box class="pin-row" spacing={10}>
+        <label label="Resolution" hexpand xalign={0} />
+        <Gtk.DropDown $={(dd: Gtk.DropDown) => {
+          dd.set_model(Gtk.StringList.new(modes.map(label)))
+          dd.set_selected(modeSel)
+          dd.connect("notify::selected", () => (modeSel = dd.get_selected()))
+        }} />
+      </box>
+      <box class="pin-row" spacing={10}>
+        <label label="Scale" hexpand xalign={0} />
+        <Gtk.DropDown $={(dd: Gtk.DropDown) => {
+          dd.set_model(Gtk.StringList.new(SCALES.map((s) => `${s * 100}%`)))
+          dd.set_selected(scaleSel)
+          dd.connect("notify::selected", () => (scaleSel = dd.get_selected()))
+        }} />
+      </box>
+      <button class="apply" halign={Gtk.Align.END}
+        onClicked={() => applyMonitor(m, modes[modeSel], SCALES[scaleSel]).then(reloadMons)}>
+        <label label="Apply" />
+      </button>
+    </box>
+  )
+}
+
+function DisplaysPage() {
+  reloadMons()
+  return (
+    <box orientation={V} spacing={18}>
+      <label class="page-title" label="Displays" xalign={0} />
+      <For each={mons}>{(m) => <MonitorCard m={m} />}</For>
+      <label class="hint" label="Changes apply immediately and are kept after you log in again." xalign={0} />
+    </box>
+  )
+}
+
 export default function Settings() {
   const [page, setPage] = createState("appearance")
   return (
@@ -227,7 +314,9 @@ export default function Settings() {
             <box visible={page((p) => p === "apps")}>
               <AppsPage />
             </box>
-            <label class="soon" label="Coming soon" visible={page((p) => p === "displays")} />
+            <box visible={page((p) => p === "displays")}>
+              <DisplaysPage />
+            </box>
           </box>
         </Gtk.ScrolledWindow>
       </box>
